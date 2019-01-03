@@ -28,20 +28,12 @@ public class ProductoController {
     @Autowired
     private ProductoServiceImpl productoService;
 
-    @GetMapping("/")
-    public String productos(Model model) {
-        List<Producto> productos = new ArrayList<>();
-        productos = productoService.buscarTodosProductos();
-
-        model.addAttribute("productos", productos);
-        return "productos";
-    }
 
     @RequestMapping("/todos")
     public List<Producto> verTodosLosProductos() {
 
-//        Producto producto = new Producto("jabon", 10, 100, null);
-//        productoService.crearProducto(producto);
+        Producto producto = new Producto("jabon", 10, 100, null);
+        productoService.crearProducto(producto);
         return productoService.buscarTodosProductos();
     }
 
