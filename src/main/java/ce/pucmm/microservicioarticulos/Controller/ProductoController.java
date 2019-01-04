@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +23,7 @@ import java.util.List;
 @RequestMapping("/productos")
 public class ProductoController {
 
-    private static String UPLOADED_FOLDER = "C://Users//EmilioFerreiras//Desktop//";
+    private static String UPLOADED_FOLDER =   System.getProperty("user.home")+"/Desktop/";
 
 
     @Autowired
@@ -32,16 +33,14 @@ public class ProductoController {
     @RequestMapping("/todos")
     public List<Producto> verTodosLosProductos() {
 
-        Producto producto = new Producto("jabon", 10, 100, null);
-        productoService.crearProducto(producto);
         return productoService.buscarTodosProductos();
     }
 
 
-    @PostMapping("/")
-    public String crearProducto(@RequestParam("foto") MultipartFile foto, @RequestParam("nombre") String nombre, @RequestParam("precio") String precio,
+    @PostMapping("/crear/")
+    public void crearProducto(@RequestParam("foto") MultipartFile foto, @RequestParam("nombre") String nombre, @RequestParam("precio") String precio,
                                 @RequestParam("existencia") String existencia,
-                                RedirectAttributes redirectAttributes) {
+                                HttpServletResponse httpResponse) throws IOException  {
 
 
         Producto producto = new Producto();
@@ -54,8 +53,7 @@ public class ProductoController {
             Path path = Paths.get(UPLOADED_FOLDER + foto.getOriginalFilename());
             Files.write(path, bytes);
 
-            redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded '" + foto.getOriginalFilename() + "'");
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,22 +63,17 @@ public class ProductoController {
         producto.setPrecio(Float.parseFloat(precio));
         producto.setStock(Integer.parseInt(existencia));
         productoService.crearProducto(producto);
-        return "redirect:/productos/";
+
+
+        httpResponse.sendRedirect("http://localhost:8080/productos/");
     }
 
 
-    @RequestMapping(value = "/ver/{id}", method = RequestMethod.GET)
-    public String ver(Model model, @PathVariable String id) {
-        Producto producto = productoService.buscarPorId(Long.parseLong(id));
-
-        model.addAttribute("producto", producto);
-        return "verproducto";
-    }
 
     @PostMapping("/modificar/")
-    public String modificarProducto(@RequestParam("nombre2") String nombre, @RequestParam("id2") String id, @RequestParam("precio2") String precio,
+    public void modificarProducto(@RequestParam("nombre2") String nombre, @RequestParam("id2") String id, @RequestParam("precio2") String precio,
                                     @RequestParam("existencia2") String existencia,
-                                    @RequestParam("foto2") MultipartFile foto, RedirectAttributes redirectAttributes) {
+                                    @RequestParam("foto2") MultipartFile foto, HttpServletResponse httpResponse) throws IOException  {
 
         Producto producto = productoService.buscarPorId(Long.parseLong(id));
         producto.setNombre(nombre);
@@ -94,23 +87,27 @@ public class ProductoController {
             Path path = Paths.get(UPLOADED_FOLDER + foto.getOriginalFilename());
             Files.write(path, bytes);
 
-            redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded '" + foto.getOriginalFilename() + "'");
 
         } catch (IOException e) {
             e.printStackTrace();
         }
         productoService.actualizarProducto(producto);
-        return "redirect:/productos/";
+
+
+        httpResponse.sendRedirect("http://localhost:8080/productos/");
     }
 
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public String borrarProducto(@PathVariable String id) {
-        Producto producto = productoService.buscarPorId(Long.parseLong(id));
-        productoService.borrarProductoPorId(producto);
-        return "redirect:/productos/";
+
+    @PostMapping(value = "/eliminar/{id}")
+    public void eliminarProducto(@PathVariable String id, HttpServletResponse httpResponse) throws IOException   {
+        productoService.borrarProductoPorId(productoService.buscarPorId(Integer.parseInt(id)));
+
+        httpResponse.sendRedirect("http://localhost:8080/productos/");
+
+
 
     }
+
 
 }

@@ -1,12 +1,15 @@
 package ce.pucmm.microservicioarticulos.Model;
 
 
+
+
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.Where;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Base64;
+import javax.persistence.*;
 
 @Entity(name = "Producto")
 @Table(name = "producto")
@@ -15,7 +18,7 @@ public class Producto implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name = "producto_id", nullable = false, unique = true, updatable = false)
+    @Column(name = "id", nullable = false, unique = true, updatable = false)
     private int id;
 
     @Column(name = "nombre")
@@ -45,7 +48,7 @@ public class Producto implements Serializable {
     }
 
 
-    public Producto() {
+    public Producto(){
 
     }
 
